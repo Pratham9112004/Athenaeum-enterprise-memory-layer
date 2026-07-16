@@ -51,7 +51,9 @@ class ChatService:
     def answer(self, *, owner_id: int, message: str, session_id: int | None) -> ChatResponse:
         if not self.llm.is_configured:
             raise ServiceUnavailableError(
-                f"Chat is unavailable: no API key configured for the '{settings.llm_provider}' LLM provider."
+                "Chat is unavailable: "
+                f"no API key configured for the "
+                f"'{settings.llm_provider}' LLM provider."
             )
 
         session = self._resolve_session(owner_id, session_id, message)
