@@ -1,0 +1,51 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Athenaeum backend — one deliberately-resolved dependency set.
+#
+# Resolved together (not pinned reactively) to avoid the chromadb transitive
+# conflicts noted in the build pitfalls. Key constraints:
+#   * bcrypt>=4.0 is REQUIRED by chromadb; we call bcrypt directly (no passlib).
+#   * email-validator is required by Pydantic EmailStr.
+#   * python-dotenv is required for pydantic-settings to load .env.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.19          # form parsing: OAuth2 form + file uploads
+
+# Config / validation
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-dotenv==1.0.1              # pitfall #3: pydantic-settings needs this for env_file
+email-validator==2.2.0           # pitfall #2: required by Pydantic EmailStr
+
+# Database
+SQLAlchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# Auth
+PyJWT==2.10.1
+bcrypt==4.2.1                    # pitfall #1: call bcrypt directly; >=4.0 for chromadb
+
+# AI / RAG stack
+chromadb==0.5.20
+google-genai==1.5.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+sentence-transformers==3.3.1     # all-MiniLM-L6-v2 (pulls torch)
+openai==1.58.1
+
+# Document parsing
+PyMuPDF==1.25.1                  # PDF
+python-docx==1.1.2               # DOCX
+
+# Logging
+loguru==0.7.3
+
+# Testing / tooling (kept in one file for MVP simplicity)
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1                    # FastAPI TestClient transport
+ruff==0.8.4
+black==24.10.0

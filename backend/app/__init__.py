@@ -1,0 +1,1 @@
+"""Athenaeum backend application package."""
