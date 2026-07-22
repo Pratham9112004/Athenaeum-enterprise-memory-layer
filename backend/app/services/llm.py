@@ -132,5 +132,6 @@ def get_llm() -> LLMProvider:
     if provider == "openai":
         return OpenAIProvider()
     raise ValueError(
-        f"Unknown LLM_PROVIDER '{settings.llm_provider}' " "— expected 'groq', 'openai', or 'gemini'."
+        f"Unknown LLM_PROVIDER '{settings.llm_provider}' "
+        "— expected 'groq', 'openai', or 'gemini'."
     )
