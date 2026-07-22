@@ -39,9 +39,11 @@ class Settings(BaseSettings):
     cookie_secure: bool = Field(default=False, alias="COOKIE_SECURE")
 
     # ── AI providers ─────────────────────────────────────────────────────────
-    llm_provider: str = Field(default="gemini", alias="LLM_PROVIDER")
+    llm_provider: str = Field(default="groq", alias="LLM_PROVIDER")
+    groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
+    groq_model: str = "llama3-8b-8192"
     gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-2.0-flash"
     openai_api_key: str = Field(default="", alias="OPENAI_API_KEY")
     openai_model: str = "gpt-4o-mini"
     embedding_model: str = "all-MiniLM-L6-v2"

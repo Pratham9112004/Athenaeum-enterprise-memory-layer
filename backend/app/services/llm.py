@@ -94,13 +94,43 @@ class GeminiProvider:
         return response.text or ""
 
 
+class GroqProvider:
+    def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
+        self.api_key = api_key if api_key is not None else settings.groq_api_key
+        self.model = model or settings.groq_model
+        self._client = None
+
+    @property
+    def is_configured(self) -> bool:
+        return bool(self.api_key)
+
+    def _get_client(self):
+        if self._client is None:
+            from groq import Groq  # lazy
+
+            self._client = Groq(api_key=self.api_key)
+        return self._client
+
+    def complete(self, system: str, messages: list[dict]) -> str:
+        client = self._get_client()
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "system", "content": system}, *messages],
+            max_tokens=settings.chat_max_tokens,
+            temperature=0.2,
+        )
+        return response.choices[0].message.content or ""
+
+
 @lru_cache
 def get_llm() -> LLMProvider:
     provider = settings.llm_provider.lower()
+    if provider == "groq":
+        return GroqProvider()
     if provider == "gemini":
         return GeminiProvider()
     if provider == "openai":
         return OpenAIProvider()
     raise ValueError(
-        f"Unknown LLM_PROVIDER '{settings.llm_provider}' " "— expected 'openai' or 'gemini'."
+        f"Unknown LLM_PROVIDER '{settings.llm_provider}' " "— expected 'groq', 'openai', or 'gemini'."
     )

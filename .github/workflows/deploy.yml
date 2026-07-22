@@ -1,0 +1,44 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute Remote Deployment Script
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            # Navigate to project directory (assumes it was cloned to ~/athenaeum)
+            cd ~/athenaeum || { echo "Project directory not found on EC2!"; exit 1; }
+            
+            echo "Pulling latest code from main..."
+            git checkout main
+            git pull origin main
+            
+            echo "Writing production environment variables..."
+            cat <<EOF > .env
+            ENVIRONMENT=production
+            LLM_PROVIDER=groq
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            GROQ_MODEL=llama-3.1-8b-instant
+            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            CORS_ORIGINS=http://${{ secrets.AWS_HOST }}:5173
+            VITE_API_URL=http://${{ secrets.AWS_HOST }}:8000/api/v1
+            EOF
+            
+            echo "Rebuilding and starting Docker containers..."
+            docker-compose build
+            docker-compose up -d --force-recreate
+            
+            echo "Cleaning up dangling images..."
+            docker image prune -f
+            
+            echo "Deployment successful!"
