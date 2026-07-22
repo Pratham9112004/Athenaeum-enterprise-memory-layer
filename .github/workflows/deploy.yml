@@ -16,6 +16,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
+            set -e
+            
             # Navigate to project directory (assumes it was cloned to ~/athenaeum)
             cd ~/athenaeum || { echo "Project directory not found on EC2!"; exit 1; }
             
@@ -35,8 +37,8 @@ jobs:
             EOF
             
             echo "Rebuilding and starting Docker containers..."
-            docker-compose build
-            docker-compose up -d --force-recreate
+            docker compose build
+            docker compose up -d --force-recreate
             
             echo "Cleaning up dangling images..."
             docker image prune -f
